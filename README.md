@@ -48,4 +48,4 @@ func main() {
 	json.Unmarshal(data, &Resp)
 
 	fmt.Println(Resp) // gives status, headers, body, etc from the cloudflare worker response :)
-}```
+}
