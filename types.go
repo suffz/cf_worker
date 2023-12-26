@@ -58,10 +58,11 @@ function _arrayBufferToBase64( buffer ) {
 }`
 
 type Cloud struct {
-	ApiURL string
-	Token  string
-	Body   string
-	Cookie struct {
+	ConfigPath string
+	ApiURL     string
+	Token      string
+	Body       string
+	Cookie     struct {
 		Name  string
 		Value string
 	}
@@ -69,6 +70,7 @@ type Cloud struct {
 }
 
 type CloudRequest struct {
+	FileSave   string // path to save the config to
 	Script     string // will use detault BasicScript variable
 	JSFileName string
 	WaitTime   int // Defaults To 15
