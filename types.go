@@ -58,6 +58,7 @@ function _arrayBufferToBase64( buffer ) {
 }`
 
 type Cloud struct {
+	Paid       bool
 	ConfigPath string
 	ApiURL     string
 	Token      string
