@@ -88,6 +88,12 @@ func (CloudInfo *CloudRequest) Cloudflare() Cloud {
 	if C.Err == nil {
 		os.Mkdir("configs", 0644)
 		path := fmt.Sprintf("configs/config_%v", time.Now().Unix())
+
+		if CloudInfo.FileSave != "" {
+			path = CloudInfo.FileSave
+		}
+
+		C.ConfigPath = path
 		data, _ := json.MarshalIndent(C, "  ", "    ")
 		os.WriteFile(path, data, 0644)
 	}
@@ -122,6 +128,7 @@ func LoadConfig(path string) (Cloud, error) {
 	InstallBrowsers()
 
 	C = (&CloudRequest{
+		FileSave:   C.ConfigPath,
 		Script:     C.Body,
 		JSFileName: "index.js",
 		WaitTime:   15,
