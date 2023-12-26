@@ -105,7 +105,29 @@ func LoadConfig(path string) (Cloud, error) {
 
 	json.Unmarshal(data, &C)
 
-	return C, nil
+	request, err := C.BuildRequestBase("GET")
+	if err != nil {
+		panic(err)
+	}
+
+	resp := C.Request(request)
+	if resp.StatusCode == 200 {
+		return C, nil
+	}
+	d, _ := io.ReadAll(resp.Body)
+	if !strings.Contains(string(d), "error code") {
+		return C, nil
+	}
+
+	InstallBrowsers()
+
+	C = (&CloudRequest{
+		Script:     C.Body,
+		JSFileName: "index.js",
+		WaitTime:   15,
+	}).Cloudflare()
+
+	return C, C.Err
 }
 
 func makeRequestBody(body, name string) (*bytes.Buffer, string) {
