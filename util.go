@@ -137,6 +137,29 @@ func LoadConfig(path string) (Cloud, error) {
 	return C, C.Err
 }
 
+func SetupPaid(playground_api string) Cloud {
+	if !strings.Contains(playground_api, "workers-playground") || !strings.Contains(playground_api, "workers.dev") {
+		return Cloud{
+			Err: errors.New("Error: Playground API URI Invalid."),
+		}
+	}
+
+	C := Cloud{
+		Paid:   true,
+		ApiURL: playground_api,
+	}
+
+	if C.Err == nil {
+		os.Mkdir("configs", 0644)
+		path := fmt.Sprintf("configs/config_%v", time.Now().Unix())
+		C.ConfigPath = path
+		data, _ := json.MarshalIndent(C, "  ", "    ")
+		os.WriteFile(path, data, 0644)
+	}
+
+	return C
+}
+
 func makeRequestBody(body, name string) (*bytes.Buffer, string) {
 	buf := new(bytes.Buffer)
 	writer := multipart.NewWriter(buf)
@@ -164,7 +187,9 @@ func (C *Cloud) BuildRequestBase(METHOD string) (*http.Request, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.AddCookie(&http.Cookie{Name: C.Cookie.Name, Value: C.Cookie.Value})
+	if !C.Paid {
+		req.AddCookie(&http.Cookie{Name: C.Cookie.Name, Value: C.Cookie.Value})
+	}
 	return req, nil
 }
 
