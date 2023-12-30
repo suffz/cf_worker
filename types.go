@@ -9,20 +9,29 @@ var BasicScript = `export default {
 		if (opts["url"]) {
 			let req_options = {}
 			if (opts["method"] == "GET" || opts["method"] == "HEAD") {
+				let headers = getHeaderObj(opts["headers"])
 				req_options = {
 					redirect: 'follow',
 					method: opts["method"],
-					headers: getHeaderObj(opts["headers"]),
+					headers: headers,
 				}
 			} else {
+				let headers = getHeaderObj(opts["headers"])
 				req_options = {
 					redirect: 'follow',
 					method: opts["method"],
 					body: 	opts["body"],
-					headers: getHeaderObj(opts["headers"]),
+					headers: headers,
 				}
 			}
 			let r = await fetch(opts["url"], req_options);
+
+			let Headers = []
+
+			r.headers.forEach((value, name) => {
+				Headers.push({name: name, value: value})
+			})
+
 			let options = {true: async function() {
 				let ra = await r.arrayBuffer()
 				return _arrayBufferToBase64(ra)
@@ -30,7 +39,9 @@ var BasicScript = `export default {
 				let ra = await r.text()
 				return ra
 			}}
+
 			return Response.json({
+				"headers":Headers,
 				"url_sent":r.url,
 				"status":r.status,
 				"body":await options[(String(opts["url"]).includes(".png"))](),
