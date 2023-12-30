@@ -16,7 +16,7 @@ import (
 	"github.com/playwright-community/playwright-go"
 )
 
-func (CloudInfo *CloudRequest) Cloudflare() Cloud {
+func (CloudInfo *CloudRequest) Cloudflare(save_to_config bool) Cloud {
 	if CloudInfo.WaitTime == 0 {
 		CloudInfo.WaitTime = 15
 	}
@@ -85,7 +85,7 @@ func (CloudInfo *CloudRequest) Cloudflare() Cloud {
 		Err: user.ERROR,
 	}
 
-	if C.Err == nil {
+	if C.Err == nil && save_to_config {
 		os.Mkdir("configs", 0644)
 		path := fmt.Sprintf("configs/config_%v", time.Now().Unix())
 
@@ -132,12 +132,12 @@ func LoadConfig(path string) (Cloud, error) {
 		Script:     C.Body,
 		JSFileName: "index.js",
 		WaitTime:   15,
-	}).Cloudflare()
+	}).Cloudflare(true)
 
 	return C, C.Err
 }
 
-func SetupPaid(playground_api string) Cloud {
+func SetupPaid(playground_api string, save_to_config bool) Cloud {
 	if !strings.Contains(playground_api, "workers-playground") || !strings.Contains(playground_api, "workers.dev") {
 		return Cloud{
 			Err: errors.New("Error: Playground API URI Invalid."),
@@ -149,7 +149,7 @@ func SetupPaid(playground_api string) Cloud {
 		ApiURL: playground_api,
 	}
 
-	if C.Err == nil {
+	if C.Err == nil && save_to_config {
 		os.Mkdir("configs", 0644)
 		path := fmt.Sprintf("configs/config_%v", time.Now().Unix())
 		C.ConfigPath = path
