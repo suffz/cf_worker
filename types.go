@@ -91,9 +91,15 @@ type CloudRequest struct {
 //
 
 type Reply struct {
-	URLSent string `json:"url_sent"`
-	Status  int    `json:"status"`
-	Body    string `json:"body"`
+	URLSent string         `json:"url_sent"`
+	Status  int            `json:"status"`
+	Body    string         `json:"body"`
+	Headers []HeadersReply `json:"headers"`
+}
+
+type HeadersReply struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
 }
 
 type WorkerRequest struct {
